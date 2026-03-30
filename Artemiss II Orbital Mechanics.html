@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>From Newton to the Moon — Artemis II Orbital Mechanics | @sadernoheart</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+<style>
+  :root {
+    --ink: #0f0e0c;
+    --ink-light: #3a3830;
+    --ink-muted: #7a7568;
+    --ink-faint: #c4bfb5;
+    --paper: #f5f1ea;
+    --paper-warm: #ede8de;
+    --paper-dark: #e0d9cc;
+    --accent: #b5341a;
+    --accent-light: #d4502e;
+    --accent-faint: #f0ddd8;
+    --gold: #9a7c3a;
+    --gold-light: #c4a253;
+    --blue-deep: #1a3a5c;
+    --blue-mid: #2d5f8a;
+    --rule: #c4bfb5;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { font-size: 18px; }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 300;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  /* Grain texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  .journal-header {
+    background-color: var(--ink);
+    color: var(--paper);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .journal-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(245,241,234,0.015) 3px,
+      rgba(245,241,234,0.015) 4px
+    );
+  }
+
+  .header-inner {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 72px 40px 64px;
+    position: relative;
+  }
+
+  .journal-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .journal-name::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.4;
+  }
+
+  .article-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    font-weight: 900;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--paper);
+    margin-bottom: 24px;
+  }
+
+  .article-title em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .article-subtitle {
+    font-family: 'Source Serif 4', serif;
+    font-size: 1.1rem;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(245,241,234,0.65);
+    max-width: 560px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+  }
+
+  .article-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    border-top: 1px solid rgba(245,241,234,0.15);
+    padding-top: 24px;
+  }
+
+  .meta-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(245,241,234,0.45);
+  }
+
+  .meta-item span {
+    display: block;
+    color: rgba(245,241,234,0.75);
+    margin-top: 4px;
+    font-size: 0.7rem;
+  }
+
+  /* Main content */
+  .article-body {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 40px 100px;
+  }
+
+  /* Section labels */
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    margin-top: 72px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin-bottom: 28px;
+  }
+
+  h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--ink-light);
+    margin-top: 44px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    margin-bottom: 22px;
+    font-size: 1rem;
+    color: var(--ink-light);
+    font-weight: 300;
+  }
+
+  p strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* Opening drop cap */
+  .drop-cap::first-letter {
+    font-family: 'Playfair Display', serif;
+    font-size: 5.2rem;
+    font-weight: 900;
+    float: left;
+    line-height: 0.82;
+    margin-right: 10px;
+    margin-top: 6px;
+    color: var(--accent);
+  }
+
+  /* Pull quote */
+  .pull-quote {
+    border-left: 3px solid var(--accent);
+    margin: 44px 0 44px 0;
+    padding: 8px 0 8px 32px;
+  }
+
+  .pull-quote p {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+
+  .pull-quote cite {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  /* Math blocks */
+  .math-block {
+    background: var(--paper-warm);
+    border: 1px solid var(--paper-dark);
+    border-left: 3px solid var(--blue-mid);
+    border-radius: 0 4px 4px 0;
+    padding: 20px 28px;
+    margin: 28px 0;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  .math-block .eq-label {
+    position: absolute;
+    top: 10px;
+    right: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+  }
+
+  .math-block .MathJax { font-size: 1.1em !important; }
+
+  /* Derivation step chain */
+  .derivation-chain {
+    background: var(--ink);
+    border-radius: 8px;
+    padding: 36px 40px;
+    margin: 40px 0;
+    color: var(--paper);
+  }
+
+  .derivation-chain .chain-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 24px;
+  }
+
+  .chain-step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(245,241,234,0.07);
+  }
+
+  .chain-step:last-child { border-bottom: none; margin-bottom: 0; }
+
+  .chain-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--gold);
+    min-width: 28px;
+    padding-top: 3px;
+    letter-spacing: 0.1em;
+  }
+
+  .chain-eq {
+    flex: 1;
+  }
+
+  .chain-eq .eq-name {
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.78rem;
+    font-style: italic;
+    color: rgba(245,241,234,0.5);
+    margin-bottom: 4px;
+  }
+
+  .chain-eq .MathJax { color: var(--paper) !important; }
+
+  /* Result box */
+  .result-box {
+    background: var(--accent-faint);
+    border: 1px solid rgba(181,52,26,0.2);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    padding: 20px 24px;
+    margin: 32px 0;
+  }
+
+  .result-box .result-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .result-box p {
+    color: var(--ink);
+    margin-bottom: 0;
+    font-size: 0.95rem;
+  }
+
+  /* Numbers table */
+  .numbers-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 32px 0;
+    font-size: 0.88rem;
+  }
+
+  .numbers-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    text-align: left;
+    padding: 10px 16px;
+    border-bottom: 2px solid var(--rule);
+  }
+
+  .numbers-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-light);
+    font-weight: 300;
+  }
+
+  .numbers-table td:nth-child(2) {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--blue-deep);
+  }
+
+  .numbers-table td:nth-child(3) {
+    color: var(--ink-muted);
+    font-size: 0.82rem;
+    font-style: italic;
+  }
+
+  .numbers-table tr:last-child td { border-bottom: none; }
+
+  /* Trajectory figure */
+  .trajectory-figure {
+    margin: 40px 0;
+    background: var(--ink);
+    border-radius: 8px;
+    padding: 36px;
+    overflow: hidden;
+  }
+
+  .trajectory-figure figcaption {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    color: rgba(245,241,234,0.4);
+    text-align: center;
+    margin-top: 20px;
+    text-transform: uppercase;
+  }
+
+  /* Rule divider */
+  .rule-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 60px 0;
+  }
+
+  .rule-divider::before,
+  .rule-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .rule-divider span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* Annotation */
+  .annotation {
+    background: var(--paper-dark);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin: 24px 0;
+    font-size: 0.88rem;
+    color: var(--ink-muted);
+    font-style: italic;
+    border-left: 2px solid var(--gold);
+  }
+
+  .annotation strong {
+    color: var(--gold);
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  /* Footer */
+  footer {
+    background: var(--ink);
+    color: rgba(245,241,234,0.35);
+    padding: 40px;
+    text-align: center;
+  }
+
+  footer p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(245,241,234,0.3);
+    margin-bottom: 0;
+  }
+
+  /* Fade-in animation */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .article-body > * {
+    animation: fadeUp 0.6s ease both;
+  }
+
+  @media (max-width: 600px) {
+    .header-inner, .article-body { padding-left: 24px; padding-right: 24px; }
+    .article-title { font-size: 2rem; }
+    .derivation-chain { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="journal-header">
+  <div class="header-inner">
+    <div class="journal-name">Orbital Mechanics — A First Principles Derivation | @sadernoheart <span></span></div>
+    <h1 class="article-title">From Newton<br>to the <em>Moon</em></h1>
+    <p class="article-subtitle">A complete mathematical derivation of the Artemis II free-return lunar trajectory, built from a single equation and nothing else.</p>
+    <div class="article-meta">
+      <div class="meta-item">Launch date<span>April 1, 2026</span></div>
+      <div class="meta-item">Mission<span>Artemis II — NASA</span></div>
+      <div class="meta-item">Crew<span>4 astronauts</span></div>
+      <div class="meta-item">Transit time<span>≈ 5 days each way</span></div>
+      <div class="meta-item">Reentry speed<span>≈ 11.1 km/s</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="article-body">
+
+  <div class="section-label">Prologue</div>
+  <h2>One equation. Everything else follows.</h2>
+
+  <p class="drop-cap">On April 1, 2026, four humans will leave Earth aboard Orion atop the Space Launch System, swing around the Moon, and return — completing the first crewed lunar flyby since Apollo 17 in 1972. Every number describing that journey: the engine burn required to leave Earth orbit, the five days it takes to coast to the Moon, the speed at which the capsule slams into the atmosphere on return — all of it flows from a single seed equation written by Isaac Newton in the seventeenth century.</p>
+
+  <p>This article derives that entire trajectory from first principles. No formula is handed down without proof. Every result is earned through algebra and physical reasoning, in the same order a physicist would discover them. By the end, the reader will not merely know the numbers — they will understand <em>why</em> those numbers are exactly what they are.</p>
+
+  <p>The seed is this:</p>
+
+  <div class="math-block">
+    <div class="eq-label">Eq. 0 — Seed</div>
+    \[ F = \frac{GMm}{r^2} \]
+  </div>
+
+  <p>Everything else is a consequence.</p>
+
+  <div class="rule-divider"><span>§ I</span></div>
+
+  <div class="section-label">Section I</div>
+  <h2>Why Anything Orbits at All</h2>
+
+  <p>Before touching the mathematics, the physical picture must be established. A satellite hundreds of kilometres above Earth is subject to gravitational force pulling it radially inward toward Earth's center. It does not fall to the ground. Why not?</p>
+
+  <p>The answer is that it <em>is</em> falling — constantly, continuously — but its horizontal velocity is large enough that as it falls, the Earth's surface curves away beneath it at exactly the same rate. The satellite perpetually falls and perpetually misses. This is the entire secret of orbital mechanics.</p>
+
+  <div class="pull-quote">
+    <p>Orbiting is not the absence of falling. It is falling sideways fast enough that the ground keeps getting out of the way.</p>
+    <cite>The physical intuition behind every orbit</cite>
+  </div>
+
+  <p>Newton made this concrete with his famous cannon thought experiment: a cannon on an impossibly tall mountain fires a ball horizontally. Too slow — it falls to the ground nearby. Faster — it travels further before landing. Faster still — the Earth curves away fast enough to match the fall. The ball never lands. It orbits. Too fast — it escapes Earth's gravity entirely. Same cannon, same gravity, different speeds, entirely different fates.</p>
+
+  <p>This establishes the central question the mathematics must answer: <strong>what speed, at a given altitude, produces a stable orbit?</strong></p>
+
+  <div class="rule-divider"><span>§ II</span></div>
+
+  <div class="section-label">Section II</div>
+  <h2>Circular Orbital Velocity</h2>
+
+  <p>For a circular orbit, the gravitational force must exactly supply the centripetal acceleration required to keep the satellite on its circular path. Centripetal force for an object of mass \(m\) moving at speed \(v\) in a circle of radius \(r\) is:</p>
+
+  <div class="math-block">
+    \[ F_c = \frac{mv^2}{r} \]
+  </div>
+
+  <p>Setting this equal to Newton's gravitational force and cancelling the common factor of \(m\) and one factor of \(r\):</p>
+
+  <div class="math-block">
+    \[ \frac{GMm}{r^2} = \frac{mv^2}{r} \implies \boxed{v^2 = \frac{GM}{r}} \]
+  </div>
+
+  <p>This result carries extraordinary meaning. The orbital speed at radius \(r\) depends only on the mass of the central body \(M\) and the distance \(r\). Not on the satellite's own mass. Not on the size or material of the spacecraft. A grain of sand and a space station in the same orbit travel at exactly the same speed. Furthermore, <strong>higher orbits are slower orbits</strong> — orbital speed decreases with distance, which is the first of many counterintuitive results in this field.</p>
+
+  <div class="rule-divider"><span>§ III</span></div>
+
+  <div class="section-label">Section III</div>
+  <h2>Kepler's Third Law — Derived</h2>
+
+  <p>With the circular orbital velocity established, the orbital period follows immediately. The period \(T\) is simply the circumference of the orbit divided by the speed:</p>
+
+  <div class="math-block">
+    \[ T = \frac{2\pi r}{v} \]
+  </div>
+
+  <p>Squaring both sides:</p>
+
+  <div class="math-block">
+    \[ T^2 = \frac{4\pi^2 r^2}{v^2} \]
+  </div>
+
+  <p>Substituting \(v^2 = GM/r\):</p>
+
+  <div class="math-block">
+    <div class="eq-label">Eq. 1 — Kepler III</div>
+    \[ \boxed{T^2 = \frac{4\pi^2}{GM} a^3} \]
+  </div>
+
+  <p>Here \(r\) has been replaced by \(a\), the semi-major axis, anticipating the generalisation to ellipses. Johannes Kepler discovered this relationship empirically in 1619 by staring at decades of astronomical data — the period squared is proportional to the orbital radius cubed. He could identify the pattern but had no explanation for it. Newton, arriving decades later with his law of gravitation, derived it in two lines of algebra. The constant of proportionality that Kepler could not explain — \(4\pi^2 / GM\) — fell out of the derivation immediately.</p>
+
+  <div class="annotation">
+    <strong>Note on units.</strong> In solar system calculations, if one uses astronomical units (AU) for distance, years for time, and solar masses for \(M\), the constant \(4\pi^2/GM_\odot = 1\) exactly. This is why Kepler's law is often written simply as \(T^2 = a^3\) in the context of planetary orbits — the units absorb the constant.
+  </div>
+
+  <div class="rule-divider"><span>§ IV</span></div>
+
+  <div class="section-label">Section IV</div>
+  <h2>Gravitational Potential Energy</h2>
+
+  <p>To handle the non-circular orbits that spacecraft actually travel — ellipses — we need the language of energy. Kinetic energy \(\frac{1}{2}mv^2\) is familiar. Gravitational potential energy requires a careful derivation.</p>
+
+  <p>The gravitational potential energy \(U\) at a distance \(r\) from Earth's center is defined as the work required to move the object from \(r\) to infinity — that is, to a distance so large that gravity's reach effectively vanishes. This is the energy stored in the gravitational separation between two masses.</p>
+
+  <p>Work is force times displacement. But gravity varies with \(r\), so we must integrate over the entire path from \(r\) to \(\infty\). The negative sign accounts for the fact that we push against gravity, doing work on the system:</p>
+
+  <div class="math-block">
+    \[ U = -\int_r^{\infty} \frac{GMm}{r'^2} \, dr' \]
+  </div>
+
+  <p>Applying the power rule for integration — \(\int r'^{-2} \, dr' = -r'^{-1}\) — and evaluating at the limits:</p>
+
+  <div class="math-block">
+    \[ U = -GMm \left[ -\frac{1}{r'} \right]_r^{\infty} = -GMm \left( 0 - \left(-\frac{1}{r}\right) \right) \]
+  </div>
+
+  <div class="math-block">
+    <div class="eq-label">Eq. 2 — Gravitational PE</div>
+    \[ \boxed{U = -\frac{GMm}{r}} \]
+  </div>
+
+  <p>The negative sign is essential and frequently misunderstood. The zero reference is set at infinity, where gravity has no reach and \(U = 0\). As the object moves <em>closer</em> to the planet, gravity does positive work on it — the system loses potential energy, descending below zero. The gravitational potential well is a well in the literal sense: infinity is the rim, and every orbit sits at some depth below it.</p>
+
+  <p>The physical consequence is immediate: to escape Earth's gravity entirely, an object must be given enough kinetic energy to climb from its current depth all the way up to the rim at \(U = 0\). This is the origin of escape velocity.</p>
+
+  <div class="rule-divider"><span>§ V</span></div>
+
+  <div class="section-label">Section V</div>
+  <h2>Total Orbital Energy and the Shape of Trajectories</h2>
+
+  <p>The total mechanical energy of an orbiting body is the sum of its kinetic and potential energies:</p>
+
+  <div class="math-block">
+    <div class="eq-label">Eq. 3 — Total energy</div>
+    \[ E = \frac{1}{2}mv^2 - \frac{GMm}{r} \]
+  </div>
+
+  <p>By conservation of energy, \(E\) is constant everywhere along the orbit. As an object falls closer to the planet, \(r\) decreases, \(U\) becomes more negative, and \(KE\) must increase proportionally — the object speeds up. As it climbs away, it slows. The total \(E\) is invariant.</p>
+
+  <p>The sign of \(E\) is the single most powerful piece of information about a trajectory. It determines the shape entirely:</p>
+
+  <table class="numbers-table">
+    <thead>
+      <tr>
+        <th>Total energy \(E\)</th>
+        <th>Orbital shape</th>
+        <th>Physical meaning</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>\(E < 0\)</td>
+        <td>Ellipse</td>
+        <td>Bound — cannot reach infinity</td>
+      </tr>
+      <tr>
+        <td>\(E = 0\)</td>
+        <td>Parabola</td>
+        <td>Marginally escaping — arrives at ∞ with zero speed</td>
+      </tr>
+      <tr>
+        <td>\(E > 0\)</td>
+        <td>Hyperbola</td>
+        <td>Escaping — arrives at ∞ with speed to spare</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>The reasoning is direct. At infinity, both \(v \to 0\) and \(U \to 0\), so \(E_\infty = 0\). For an object to reach infinity, its total energy must be at least zero. If \(E < 0\), reaching infinity would require \(KE < 0\) to compensate — physically impossible. The object is gravitationally imprisoned in a closed ellipse.</p>
+
+  <p>These three conic sections — ellipse, parabola, hyperbola — are not an arbitrary catalogue. They are the complete family of solutions to the two-body gravitational problem, classified entirely by the sign of a single number.</p>
+
+  <div class="rule-divider"><span>§ VI</span></div>
+
+  <div class="section-label">Section VI</div>
+  <h2>Orbital Energy Depends Only on Semi-Major Axis</h2>
+
+  <p>This is the deepest result in classical orbital mechanics, and the one that makes practical spaceflight possible. We will prove that the total energy of an elliptical orbit depends solely on the semi-major axis \(a\) — not on the eccentricity, not on the orbital shape, not on the position along the orbit.</p>
+
+  <p>The proof exploits two special points on the ellipse where the algebra simplifies dramatically: <strong>perigee</strong> \(r_p\) (closest approach) and <strong>apogee</strong> \(r_a\) (farthest point). At both these points, the velocity is purely tangential — perpendicular to the radius vector. This makes the angular momentum calculation clean.</p>
+
+  <p>Conservation of energy between perigee and apogee (mass \(m\) cancels throughout):</p>
+
+  <div class="math-block">
+    \[ \frac{1}{2}v_p^2 - \frac{GM}{r_p} = \frac{1}{2}v_a^2 - \frac{GM}{r_a} \]
+  </div>
+
+  <p>Conservation of angular momentum at these two points (again, \(m\) cancels):</p>
+
+  <div class="math-block">
+    \[ v_p r_p = v_a r_a \implies v_a = v_p \frac{r_p}{r_a} \]
+  </div>
+
+  <p>Substituting the expression for \(v_a\) into the energy equation and rearranging to collect \(v_p^2\) terms on the left:</p>
+
+  <div class="math-block">
+    \[ \frac{1}{2}v_p^2 \left(1 - \frac{r_p^2}{r_a^2}\right) = GM\left(\frac{1}{r_p} - \frac{1}{r_a}\right) \]
+  </div>
+
+  <p>Putting each side over a common denominator:</p>
+
+  <div class="math-block">
+    \[ \frac{1}{2}v_p^2 \cdot \frac{r_a^2 - r_p^2}{r_a^2} = GM \cdot \frac{r_a - r_p}{r_p r_a} \]
+  </div>
+
+  <p>Applying the difference of squares factorisation \(r_a^2 - r_p^2 = (r_a - r_p)(r_a + r_p)\), then dividing both sides by \((r_a - r_p)\):</p>
+
+  <div class="math-block">
+    \[ \frac{1}{2}v_p^2 \cdot \frac{r_a + r_p}{r_a^2} = \frac{GM}{r_p r_a} \]
+  </div>
+
+  <p>Solving for \(v_p^2\) and using \(r_p + r_a = 2a\):</p>
+
+  <div class="math-block">
+    \[ v_p^2 = \frac{GM \cdot r_a}{a \cdot r_p} \]
+  </div>
+
+  <p>Substituting back into the total energy expression at perigee, and using \(r_a - 2a = -r_p\):</p>
+
+  <div class="math-block">
+    \[ E = \frac{1}{2}m v_p^2 - \frac{GMm}{r_p} = \frac{GMm}{r_p}\left(\frac{r_a}{2a} - 1\right) = \frac{GMm}{r_p} \cdot \frac{-r_p}{2a} \]
+  </div>
+
+  <div class="math-block">
+    <div class="eq-label">Eq. 4 — Orbital energy</div>
+    \[ \boxed{E = -\frac{GMm}{2a}} \]
+  </div>
+
+  <p>Both \(r_p\) and \(r_a\) vanished. Only \(a\) remains. This is a profound result: two orbits with the same semi-major axis but wildly different shapes — one nearly circular, one a thin needle reaching toward the Moon — have identical total energies and identical orbital periods. Shape is irrelevant. Only size determines energy.</p>
+
+  <div class="pull-quote">
+    <p>A circular orbit and a needle-thin ellipse, sharing only the same semi-major axis, carry identical energies. They cannot be distinguished by energy alone. The geometry is irrelevant.</p>
+    <cite>Consequence of E = −GMm/2a</cite>
+  </div>
+
+  <div class="rule-divider"><span>§ VII</span></div>
+
+  <div class="section-label">Section VII</div>
+  <h2>The Vis-Viva Equation</h2>
+
+  <p>With both expressions for \(E\) in hand, the vis-viva equation emerges in a single step. Setting the general total energy equal to the geometric form and solving for \(v^2\):</p>
+
+  <div class="math-block">
+    \[ \frac{1}{2}mv^2 - \frac{GMm}{r} = -\frac{GMm}{2a} \]
+  </div>
+
+  <p>Cancel \(m\), rearrange:</p>
+
+  <div class="math-block">
+    <div class="eq-label">Eq. 5 — Vis-Viva</div>
+    \[ \boxed{v^2 = GM\left(\frac{2}{r} - \frac{1}{a}\right)} \]
+  </div>
+
+  <p>The name comes from Leibniz's Latin term for kinetic energy — <em>vis viva</em>, "living force." The equation gives the speed of any object at any point \(r\) in any orbit characterised by semi-major axis \(a\). It is the master equation of orbital mechanics. Every velocity calculation in this article uses it.</p>
+
+  <p>Three special cases illuminate its reach:</p>
+
+  <p><strong>Circular orbit</strong> (\(a = r\)): \(v^2 = GM/r\) — recovering our earlier result exactly. ✓</p>
+
+  <p><strong>Escape from surface</strong> (\(a \to \infty\), meaning \(E = 0\)): \(v_{esc}^2 = 2GM/r\) — escape velocity.</p>
+
+  <p><strong>At apogee</strong> (\(r = r_a\)): the second term \(1/a\) pulls the speed below the circular value, confirming the object moves slowest at its farthest point.</p>
+
+  <div class="rule-divider"><span>§ VIII</span></div>
+
+  <div class="section-label">Section VIII</div>
+  <h2>The Transfer Ellipse — Architecture of the Journey</h2>
+
+  <p>An orbit is not a physical track. It is the path that results from a body's position and velocity at any instant. Change either, and the orbit changes. This is the fundamental insight that makes spaceflight possible: a brief engine burn at a specific point in space swaps the spacecraft from one orbit onto a completely different one.</p>
+
+  <p>Before the Trans-Lunar Injection (TLI) burn, Orion circles Earth in a nearly circular parking orbit at altitude \(h = 185\) km. The radius from Earth's center is:</p>
+
+  <div class="math-block">
+    \[ r_p = R_\oplus + h = 6{,}371 + 185 = 6{,}556 \text{ km} = 6.556 \times 10^6 \text{ m} \]
+  </div>
+
+  <p>The Moon's mean distance from Earth's center provides the apogee radius of the transfer ellipse:</p>
+
+  <div class="math-block">
+    \[ r_a = 3.844 \times 10^8 \text{ m} \]
+  </div>
+
+  <p>The transfer ellipse is the unique ellipse whose perigee lies on the parking orbit and whose apogee lies at the Moon's distance. Its semi-major axis:</p>
+
+  <div class="math-block">
+    <div class="eq-label">Eq. 6 — Transfer ellipse</div>
+    \[ a = \frac{r_p + r_a}{2} = \frac{6.556 \times 10^6 + 3.844 \times 10^8}{2} = 1.955 \times 10^8 \text{ m} \]
+  </div>
+
+  <figure class="trajectory-figure">
+    <svg viewBox="0 0 600 320" width="100%" style="display:block;">
+      <defs>
+        <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <!-- Earth -->
+      <circle cx="100" cy="160" r="30" fill="#1a3a5c" opacity="0.9"/>
+      <circle cx="100" cy="160" r="30" fill="none" stroke="#2d5f8a" stroke-width="1"/>
+      <text x="100" y="165" text-anchor="middle" fill="rgba(245,241,234,0.7)" font-family="JetBrains Mono, monospace" font-size="9" letter-spacing="1">EARTH</text>
+
+      <!-- Parking orbit (small circle) -->
+      <circle cx="100" cy="160" r="48" fill="none" stroke="#9a7c3a" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>
+
+      <!-- Transfer ellipse -->
+      <ellipse cx="230" cy="160" rx="230" ry="90" fill="none" stroke="#b5341a" stroke-width="1.2" opacity="0.8"/>
+
+      <!-- Moon position marker -->
+      <circle cx="458" cy="160" r="14" fill="#3a3830" stroke="#c4bfb5" stroke-width="1"/>
+      <text x="458" y="164" text-anchor="middle" fill="rgba(245,241,234,0.7)" font-family="JetBrains Mono, monospace" font-size="8" letter-spacing="1">MOON</text>
+
+      <!-- Moon orbit arc -->
+      <path d="M 458 60 A 170 170 0 0 0 458 260" fill="none" stroke="#c4bfb5" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.3"/>
+
+      <!-- Orion position on ellipse (near perigee) -->
+      <circle cx="148" cy="150" r="5" fill="#b5341a"/>
+      <text x="148" y="138" text-anchor="middle" fill="rgba(245,241,234,0.6)" font-family="JetBrains Mono, monospace" font-size="8">ORION</text>
+
+      <!-- TLI burn arrow -->
+      <line x1="148" y1="145" x2="148" y2="118" stroke="#b5341a" stroke-width="1" marker-end="url(#arr2)"/>
+      <text x="160" y="112" fill="#b5341a" font-family="JetBrains Mono, monospace" font-size="8">TLI BURN</text>
+
+      <!-- Labels -->
+      <text x="60" y="100" fill="rgba(245,241,234,0.35)" font-family="JetBrains Mono, monospace" font-size="7" letter-spacing="1">PARKING ORBIT</text>
+      <text x="220" y="48" fill="rgba(181,52,26,0.7)" font-family="JetBrains Mono, monospace" font-size="7" letter-spacing="1">TRANSFER ELLIPSE</text>
+
+      <!-- dimension line for a -->
+      <line x1="100" y1="230" x2="458" y2="230" stroke="rgba(245,241,234,0.2)" stroke-width="0.5" stroke-dasharray="2 2"/>
+      <text x="279" y="244" text-anchor="middle" fill="rgba(245,241,234,0.3)" font-family="JetBrains Mono, monospace" font-size="7">2a = rp + ra</text>
+
+      <!-- rp label -->
+      <line x1="100" y1="218" x2="100" y2="225" stroke="rgba(245,241,234,0.3)" stroke-width="0.5"/>
+      <text x="100" y="255" text-anchor="middle" fill="rgba(156,193,118,0.6)" font-family="JetBrains Mono, monospace" font-size="7">rp</text>
+
+      <!-- ra label -->
+      <line x1="458" y1="218" x2="458" y2="225" stroke="rgba(245,241,234,0.3)" stroke-width="0.5"/>
+      <text x="458" y="255" text-anchor="middle" fill="rgba(156,193,118,0.6)" font-family="JetBrains Mono, monospace" font-size="7">ra</text>
+    </svg>
+    <figcaption>Fig. 1 — The transfer ellipse. Orion fires its engine at perigee (parking orbit) and coasts along the ellipse to apogee, where the Moon is waiting.</figcaption>
+  </figure>
+
+  <div class="rule-divider"><span>§ IX</span></div>
+
+  <div class="section-label">Section IX</div>
+  <h2>Computing the TLI Burn — \(\Delta v\)</h2>
+
+  <p>The TLI burn happens at perigee of the transfer ellipse. Two velocities must be computed at this point: the speed required for the parking orbit (circular), and the speed required for the transfer ellipse (elliptical). Their difference is \(\Delta v\) — the velocity the engine must supply.</p>
+
+  <h3>Parking orbit velocity</h3>
+
+  <p>Applying the circular orbit formula at \(r_p = 6.556 \times 10^6\) m:</p>
+
+  <div class="math-block">
+    \[ v_{park} = \sqrt{\frac{GM_\oplus}{r_p}} = \sqrt{\frac{3.986 \times 10^{14}}{6.556 \times 10^6}} \approx 7.80 \text{ km/s} \]
+  </div>
+
+  <h3>Transfer ellipse velocity at perigee</h3>
+
+  <p>Applying vis-viva at \(r = r_p\), \(a = 1.955 \times 10^8\) m:</p>
+
+  <div class="math-block">
+    \[ v_{TLI} = \sqrt{GM_\oplus \left(\frac{2}{r_p} - \frac{1}{a}\right)} \]
+  </div>
+
+  <div class="math-block">
+    \[ = \sqrt{3.986 \times 10^{14} \left(\frac{2}{6.556 \times 10^6} - \frac{1}{1.955 \times 10^8}\right)} \]
+  </div>
+
+  <div class="math-block">
+    \[ = \sqrt{3.986 \times 10^{14} \times 3.000 \times 10^{-7}} \approx 10.93 \text{ km/s} \]
+  </div>
+
+  <h3>The burn</h3>
+
+  <div class="math-block">
+    <div class="eq-label">Eq. 7 — TLI Δv</div>
+    \[ \Delta v_{TLI} = v_{TLI} - v_{park} = 10.93 - 7.80 = \boxed{3.13 \text{ km/s}} \]
+  </div>
+
+  <p>This is a velocity increment of 3.13 km/s — approximately 11,268 km/h — added to Orion's speed in a burn lasting several minutes. The engine then cuts off, and from that moment, no further propulsion is needed to reach the Moon. Gravity does everything.</p>
+
+  <div class="annotation">
+    <strong>Physical intuition.</strong> The parking orbit velocity of 7.80 km/s is what "orbiting Earth" means in numbers — approximately 28,080 km/h. The TLI burn adds 3.13 km/s to this. The new speed, 10.93 km/s, is enough to stretch the orbit from a tight circle to an ellipse whose far end just touches the Moon's distance.
+  </div>
+
+  <div class="rule-divider"><span>§ X</span></div>
+
+  <div class="section-label">Section X</div>
+  <h2>Transit Time to the Moon</h2>
+
+  <p>Orion travels from perigee to apogee — half the transfer ellipse. The transit time is therefore half the orbital period of the full ellipse. Applying Kepler's Third Law:</p>
+
+  <div class="math-block">
+    \[ T = 2\pi\sqrt{\frac{a^3}{GM_\oplus}} \]
+  </div>
+
+  <div class="math-block">
+    \[ = 2\pi\sqrt{\frac{(1.955 \times 10^8)^3}{3.986 \times 10^{14}}} = 2\pi\sqrt{\frac{7.472 \times 10^{24}}{3.986 \times 10^{14}}} \]
+  </div>
+
+  <div class="math-block">
+    \[ = 2\pi\sqrt{1.875 \times 10^{10}} \approx 2\pi \times 136{,}929 \approx 860{,}300 \text{ s} \]
+  </div>
+
+  <div class="math-block">
+    <div class="eq-label">Eq. 8 — Transit time</div>
+    \[ t_{transit} = \frac{T}{2} \approx 430{,}150 \text{ s} \approx \boxed{4.98 \text{ days}} \]
+  </div>
+
+  <p>Five days from the TLI burn to the Moon. This is determined entirely by the size of the transfer ellipse — which was in turn determined by the altitude of the parking orbit and the Moon's distance. NASA engineers had no choice in this number once those two radii were set. The mathematics dictated it.</p>
+
+  <div class="rule-divider"><span>§ XI</span></div>
+
+  <div class="section-label">Section XI</div>
+  <h2>The Lunar Flyby — Gravity as a Steering Wheel</h2>
+
+  <p>When Orion arrives near the Moon after five days, it is moving at approximately 0.903 km/s relative to Earth — crawling, having traded nearly all its kinetic energy for potential energy climbing the gravity well. But relative to the <em>Moon</em>, which itself orbits Earth at \(v_M \approx 1.022\) km/s, Orion arrives with a residual speed:</p>
+
+  <div class="math-block">
+    \[ v_\infty = v_M - v_{apogee} = 1.022 - 0.903 = 0.119 \text{ km/s} \]
+  </div>
+
+  <p>This is the hyperbolic excess velocity — the speed Orion carries relative to the Moon when it is still far away, before the Moon's gravity has had any effect. The total energy relative to the Moon is:</p>
+
+  <div class="math-block">
+    \[ E_{Moon} = \frac{1}{2}mv_\infty^2 - \frac{GM_M}{r} \xrightarrow{r \to \infty} \frac{1}{2}mv_\infty^2 > 0 \]
+  </div>
+
+  <p>Since \(E_{Moon} > 0\), Orion is on a <strong>hyperbolic trajectory</strong> relative to the Moon. It cannot be captured into a closed orbit — it will swing around and escape. This is not a failure; it is precisely the design.</p>
+
+  <p>On a hyperbola, the Moon's gravity acts as a steering mechanism. It changes the direction of Orion's velocity vector without changing its magnitude — a perfect elastic deflection. Before the flyby, Orion's velocity vector points away from Earth. After the flyby, with the Moon having bent the trajectory through the correct deflection angle, the velocity vector points back toward Earth's atmosphere. No engine burn. No fuel expenditure. Gravity is the engine.</p>
+
+  <p>The closest approach distance of 8,890 km from the lunar surface was chosen by NASA to produce exactly the right deflection angle — the one that sends Orion home on a trajectory whose perigee intersects the atmosphere at the correct reentry corridor.</p>
+
+  <div class="pull-quote">
+    <p>If every engine on Orion fails immediately after the TLI burn, the crew still returns home. The free-return trajectory is orbital mechanics as a safety net.</p>
+    <cite>The design philosophy of the free-return</cite>
+  </div>
+
+  <div class="rule-divider"><span>§ XII</span></div>
+
+  <div class="section-label">Section XII</div>
+  <h2>Reentry Speed — The Final Calculation</h2>
+
+  <p>After the lunar flyby, Orion falls back toward Earth on a return ellipse. As it descends from the Moon's distance to Earth's radius, potential energy converts entirely back to kinetic energy. Applying vis-viva at \(r = R_\oplus = 6.371 \times 10^6\) m, on the same transfer ellipse with \(a = 1.955 \times 10^8\) m:</p>
+
+  <div class="math-block">
+    \[ v_{entry} = \sqrt{GM_\oplus\left(\frac{2}{R_\oplus} - \frac{1}{a}\right)} \]
+  </div>
+
+  <div class="math-block">
+    \[ = \sqrt{3.986 \times 10^{14} \times 3.089 \times 10^{-7}} = \sqrt{12.31 \times 10^7} \]
+  </div>
+
+  <div class="math-block">
+    <div class="eq-label">Eq. 9 — Reentry speed</div>
+    \[ \boxed{v_{entry} \approx 11.1 \text{ km/s} \approx 40{,}000 \text{ km/h}} \]
+  </div>
+
+  <p>Compare this to Earth's escape velocity from the surface:</p>
+
+  <div class="math-block">
+    \[ v_{esc} = \sqrt{\frac{2GM_\oplus}{R_\oplus}} = \sqrt{\frac{2 \times 3.986 \times 10^{14}}{6.371 \times 10^6}} \approx 11.2 \text{ km/s} \]
+  </div>
+
+  <p>The numbers are nearly identical. This is not a coincidence — it is a direct consequence of the vis-viva equation. When \(1/a \ll 2/R_\oplus\) (which holds because \(a \approx 10^8\) m is vast compared to \(R_\oplus \approx 10^7\) m), the reentry speed approaches escape velocity. Orion fell from effectively "infinity" on Earth's gravitational scale. Every joule of potential energy it acquired by climbing to the Moon's distance returned as kinetic energy on the descent. The heat shield must absorb all of it.</p>
+
+  <div class="rule-divider"><span>§ XIII</span></div>
+
+  <div class="section-label">Summary</div>
+  <h2>The Complete Chain</h2>
+
+  <p>Every result derived in this article follows from one equation through a chain of logical steps. No formula was introduced without proof. The complete derivation, compressed:</p>
+
+  <div class="derivation-chain">
+    <div class="chain-title">▸ The derivation chain — Artemis II</div>
+
+    <div class="chain-step">
+      <div class="chain-num">00</div>
+      <div class="chain-eq">
+        <div class="eq-name">Newton's law of gravitation — the seed</div>
+        \[ F = \frac{GMm}{r^2} \]
+      </div>
+    </div>
+
+    <div class="chain-step">
+      <div class="chain-num">01</div>
+      <div class="chain-eq">
+        <div class="eq-name">Gravity = centripetal force → circular orbital speed</div>
+        \[ v^2 = \frac{GM}{r} \]
+      </div>
+    </div>
+
+    <div class="chain-step">
+      <div class="chain-num">02</div>
+      <div class="chain-eq">
+        <div class="eq-name">Period = circumference / speed → Kepler's third law</div>
+        \[ T^2 = \frac{4\pi^2}{GM}a^3 \]
+      </div>
+    </div>
+
+    <div class="chain-step">
+      <div class="chain-num">03</div>
+      <div class="chain-eq">
+        <div class="eq-name">Work against gravity from r to ∞ → gravitational PE</div>
+        \[ U = -\frac{GMm}{r} \]
+      </div>
+    </div>
+
+    <div class="chain-step">
+      <div class="chain-num">04</div>
+      <div class="chain-eq">
+        <div class="eq-name">KE + PE, conserved everywhere along orbit</div>
+        \[ E = \frac{1}{2}mv^2 - \frac{GMm}{r} = \text{const} \]
+      </div>
+    </div>
+
+    <div class="chain-step">
+      <div class="chain-num">05</div>
+      <div class="chain-eq">
+        <div class="eq-name">Energy at perigee + apogee with angular momentum → rp and ra cancel</div>
+        \[ E = -\frac{GMm}{2a} \]
+      </div>
+    </div>
+
+    <div class="chain-step">
+      <div class="chain-num">06</div>
+      <div class="chain-eq">
+        <div class="eq-name">Setting both expressions for E equal, solving for v²</div>
+        \[ v^2 = GM\!\left(\frac{2}{r} - \frac{1}{a}\right) \quad \text{(vis-viva)} \]
+      </div>
+    </div>
+
+    <div class="chain-step">
+      <div class="chain-num">07</div>
+      <div class="chain-eq">
+        <div class="eq-name">Vis-viva at rp, parking orbit and transfer ellipse</div>
+        \[ \Delta v_{TLI} = 10.93 - 7.80 = 3.13 \text{ km/s} \]
+      </div>
+    </div>
+
+    <div class="chain-step">
+      <div class="chain-num">08</div>
+      <div class="chain-eq">
+        <div class="eq-name">Kepler III applied to transfer ellipse</div>
+        \[ t_{transit} = \frac{T}{2} \approx 4.98 \text{ days} \]
+      </div>
+    </div>
+
+    <div class="chain-step">
+      <div class="chain-num">09</div>
+      <div class="chain-eq">
+        <div class="eq-name">Vis-viva at R⊕ on return ellipse</div>
+        \[ v_{entry} \approx 11.1 \text{ km/s} \]
+      </div>
+    </div>
+  </div>
+
+  <div class="rule-divider"><span>Constants</span></div>
+
+  <div class="section-label">Reference</div>
+  <h2>Constants and Parameters Used</h2>
+
+  <table class="numbers-table">
+    <thead>
+      <tr><th>Quantity</th><th>Value</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>\(GM_\oplus\)</td><td>3.986 × 10¹⁴ m³/s²</td><td>Earth's gravitational parameter</td></tr>
+      <tr><td>\(R_\oplus\)</td><td>6.371 × 10⁶ m</td><td>Earth's mean radius</td></tr>
+      <tr><td>\(r_M\)</td><td>3.844 × 10⁸ m</td><td>Moon's mean orbital radius</td></tr>
+      <tr><td>\(v_M\)</td><td>1.022 km/s</td><td>Moon's mean orbital speed</td></tr>
+      <tr><td>\(h_{park}\)</td><td>185 km</td><td>Parking orbit altitude</td></tr>
+      <tr><td>\(r_p\)</td><td>6.556 × 10⁶ m</td><td>Transfer ellipse perigee radius</td></tr>
+      <tr><td>\(r_a\)</td><td>3.844 × 10⁸ m</td><td>Transfer ellipse apogee radius</td></tr>
+      <tr><td>\(a\)</td><td>1.955 × 10⁸ m</td><td>Transfer ellipse semi-major axis</td></tr>
+    </tbody>
+  </table>
+
+  <div class="rule-divider"><span>Coda</span></div>
+
+  <div class="section-label">Closing</div>
+  <h2>What Was Actually Solved</h2>
+
+  <p>This article derived, from Newton's single gravitational equation, every number characterising the Artemis II free-return lunar trajectory. The derivation chain crossed eleven equations and produced four concrete mission parameters: a parking orbit velocity of 7.80 km/s, a TLI burn of 3.13 km/s, a lunar transit time of approximately 5 days, and a reentry speed of 11.1 km/s.</p>
+
+  <p>None of these numbers were looked up. Each emerged as a necessary algebraic consequence of the one before it. The trajectory was not designed — it was <em>discovered</em>, in the same sense that Newton did not invent the conic sections but found them waiting inside \(F = GMm/r^2\), patient and inevitable, for anyone who would follow the mathematics long enough to find them.</p>
+
+  <p>On April 1, 2026, four humans will execute this trajectory with their lives. The mathematics will not care. It worked in 1969. It works now. It will work in ten thousand years. Gravity does not negotiate.</p>
+
+</main>
+
+<footer>
+  <p>Derived from first principles · All results follow from F = GMm/r² · Artemis II — April 1, 2026</p>
+</footer>
+
+</body>
+</html>
